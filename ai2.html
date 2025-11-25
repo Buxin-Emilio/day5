@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2025 Tech Store | 极简未来商城</title>
+    <style>
+      /* * ==========================================
+         * 1. 全局设定 & 变量 (Global Variables)
+         * ==========================================
+         */
+      :root {
+        --primary: #4361ee; /* 主色 */
+        --primary-glow: rgba(67, 97, 238, 0.4);
+        --bg-dark: #0f0f1a; /* 全局暗黑背景 */
+        --card-white: #ffffff; /* 卡片白色 */
+        --text-dark: #1e202b;
+        --text-light: #f8f9fa;
+        --text-grey: #8892b0;
+        --radius: 16px; /* 圆角 */
+        --nav-height: 64px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+        padding-top: var(--nav-height); /* 防止内容被导航栏遮挡 */
+        overflow-x: hidden;
+      }
+
+      /* * ==========================================
+         * 2. 固定顶部导航 (Fixed Navbar)
+         * ==========================================
+         */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(15, 15, 26, 0.85); /* 半透明深色背景 */
+        backdrop-filter: blur(12px); /* 玻璃磨砂效果 */
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 1000;
+      }
+
+      .logo {
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+      }
+
+      .logo span {
+        color: var(--primary);
+      }
+
+      .nav-icons {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+        fill: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .nav-icon:hover {
+        fill: var(--primary);
+      }
+
+      /* * ==========================================
+         * 3. 全屏渐变英雄区 (Hero Section)
+         * ==========================================
+         */
+      .hero {
+        height: 70vh; /* 占据70%视口高度 */
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        background: radial-gradient(
+          circle at 50% 120%,
+          #2a3b9e 0%,
+          var(--bg-dark) 70%
+        );
+        overflow: hidden;
+      }
+
+      /* 装饰性光晕 */
+      .hero::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: var(--primary);
+        filter: blur(120px);
+        opacity: 0.3;
+        border-radius: 50%;
+        top: 10%;
+        left: 10%;
+        animation: float 10s infinite alternate;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem); /* 响应式字体大小 */
+        color: white;
+        margin-bottom: 16px;
+        line-height: 1.1;
+        z-index: 2;
+        text-shadow: 0 0 30px rgba(67, 97, 238, 0.5);
+      }
+
+      .hero p {
+        color: var(--text-grey);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin-bottom: 32px;
+        z-index: 2;
+      }
+
+      .cta-btn {
+        padding: 14px 32px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 10px 25px var(--primary-glow);
+        transition: 0.3s;
+        z-index: 2;
+      }
+
+      .cta-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px var(--primary-glow);
+      }
+
+      /* * ==========================================
+         * 4. 分类入口 (Categories)
+         * ==========================================
+         */
+      .section-title {
+        color: white;
+        font-size: 1.5rem;
+        margin: 40px 0 24px;
+        padding: 0 5%; /* 左右留白 */
+      }
+
+      .categories {
+        display: flex;
+        justify-content: space-between; /* 保持间距 */
+        padding: 0 5%;
+        gap: 16px;
+        overflow-x: auto; /* 手机端支持横向滑动 */
+        padding-bottom: 10px;
+        scrollbar-width: none; /* 隐藏滚动条 */
+      }
+      .categories::-webkit-scrollbar {
+        display: none;
+      }
+
+      .cat-item {
+        min-width: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .cat-icon-box {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: 0.3s;
+      }
+
+      .cat-item:hover .cat-icon-box {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .cat-icon-box svg {
+        width: 24px;
+        height: 24px;
+        fill: white;
+      }
+      .cat-text {
+        color: var(--text-grey);
+        font-size: 0.85rem;
+      }
+
+      /* * ==========================================
+         * 5. 响应式商品网格 (Product Grid)
+         * ==========================================
+         */
+      .grid-container {
+        padding: 0 5% 80px; /* 底部留白给Footer */
+      }
+
+      .product-grid {
+        display: grid;
+        gap: 16px;
+        /* 默认桌面端：5列 */
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      /* 商品卡片样式 */
+      .card {
+        background: var(--card-white);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: 0.3s;
+        position: relative;
+        /* 玻璃拟态阴影 (浅色卡片上的微光) */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(67, 97, 238, 0.25); /* 悬浮发光 */
+      }
+
+      .card-img {
+        width: 100%;
+        aspect-ratio: 1 / 1; /* 正方形图片区 */
+        background: #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      /* 模拟图片内容 */
+      .card-img svg {
+        width: 40px;
+        height: 40px;
+        fill: #ced4da;
+      }
+
+      .card-info {
+        padding: 12px;
+      }
+
+      .card-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .card-desc {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+      }
+
+      .card-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .price {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+
+      .add-btn {
+        width: 32px;
+        height: 32px;
+        background: var(--bg-dark);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .add-btn svg {
+        fill: white;
+        width: 16px;
+      }
+      .add-btn:hover {
+        background: var(--primary);
+      }
+
+      /* * ==========================================
+         * 6. 悬浮购物车按钮 (Floating Action Button)
+         * ==========================================
+         */
+      .fab {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: var(--primary);
+        border-radius: 50%;
+        box-shadow: 0 10px 30px var(--primary-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 900;
+        transition: 0.3s;
+      }
+
+      .fab:hover {
+        transform: scale(1.1);
+      }
+
+      .fab svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+      }
+
+      .badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #ff3b30;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: bold;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--bg-dark);
+      }
+
+      /* * ==========================================
+         * 7. 底部版权 (Footer)
+         * ==========================================
+         */
+      footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-grey);
+        font-size: 0.85rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        margin-top: 40px;
+      }
+
+      /* * ==========================================
+         * 8. 媒体查询适配 (Media Queries)
+         * ==========================================
+         */
+
+      /* 平板端适配 (3列) */
+      @media (max-width: 1024px) {
+        .product-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* 手机端适配 (关键：强制2列) */
+      @media (max-width: 768px) {
+        .product-grid {
+          grid-template-columns: repeat(2, 1fr); /* 手机强制2列 */
+          gap: 12px; /* 手机端间距稍小 */
+        }
+
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .section-title {
+          padding: 0 20px;
+        }
+
+        .grid-container {
+          padding: 0 20px 80px;
+        }
+
+        .categories {
+          padding: 0 20px 10px;
+        }
+
+        /* 手机端隐藏部分非必要导航图标 */
+        .nav-icon.desktop-only {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">NEXT<span>STORE</span></div>
+      <div class="nav-icons">
+        <svg class="nav-icon desktop-only" viewBox="0 0 24 24">
+          <path
+            d="M15.5,14h-0.79l-0.28-0.27C15.41,12.59,16,11.11,16,9.5C16,5.91,13.09,3,9.5,3S3,5.91,3,9.5S5.91,16,9.5,16c1.61,0,3.09-0.59,4.23-1.57l0.27,0.28v0.79l5,4.99L20.49,19L15.5,14z M9.5,14C7.01,14,5,11.99,5,9.5S7.01,5,9.5,5S14,7.01,14,9.5S11.99,14,9.5,14z"
+          />
+        </svg>
+        <svg class="nav-icon" viewBox="0 0 24 24">
+          <path
+            d="M12,12c2.21,0,4-1.79,4-4s-1.79-4-4-4S8,5.79,8,8S9.79,12,12,12z M12,14c-2.67,0-8,1.34-8,4v2h16v-2C20,15.34,14.67,14,12,14z"
+          />
+        </svg>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <h1>DISCOVER<br />FUTURE TECH</h1>
+      <p>2025年春季新品发布，探索极致科技美学。</p>
+      <button class="cta-btn">立即抢购</button>
+    </header>
+
+    <h3 class="section-title">热门分类</h3>
+    <section class="categories">
+      <div class="cat-item">
+        <div class="cat-icon-box">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M17,1.01L7,1C5.9,1,5,1.9,5,3v18c0,1.1,0.9,2,2,2h10c1.1,0,2-0.9,2-2V3C19,1.9,18.1,1.01,17,1.01z M17,19H7V5h10V19z"
+            />
+          </svg>
+        </div>
+        <span class="cat-text">手机</span>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon-box">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M20,18c1.1,0,2-0.9,2-2V6c0-1.1-0.9-2-2-2H4C2.9,4,2,4.9,2,6v10c0,1.1,0.9,2,2,2H0v2h24v-2H20z M4,6h16v10H4V6z"
+            />
+          </svg>
+        </div>
+        <span class="cat-text">电脑</span>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon-box">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,16c-2.21,0-4-1.79-4-4s1.79-4,4-4s4,1.79,4,4S14.21,16,12,16z"
+            />
+          </svg>
+        </div>
+        <span class="cat-text">穿戴</span>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon-box">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21,5c-1.11-0.35-2.33-0.5-3.5-0.5c-1.95,0-4.05,0.4-5.5,1.5c-1.45-1.1-3.55-1.5-5.5-1.5S2.45,4.9,1,6v14.65 c0,0.25,0.25,0.5,0.5,0.5c0.1,0,0.15-0.05,0.25-0.05C3.1,20.45,5.05,20,6.5,20c1.95,0,4.05,0.4,5.5,1.5c1.35-0.85,3.8-1.5,5.5-1.5 c1.65,0,3.35,0.3,4.75,1.05c0.1,0.05,0.15,0.05,0.25,0.05c0.25,0,0.5-0.25,0.5-0.5V6C22.4,5.55,21.75,5.25,21,5z M21,18.5 c-1.1-0.35-2.3-0.5-3.5-0.5c-1.7,0-4.15,0.65-5.5,1.5V8c1.35-0.85,3.8-1.5,5.5-1.5c1.2,0,2.4,0.15,3.5,0.5V18.5z"
+            />
+          </svg>
+        </div>
+        <span class="cat-text">配件</span>
+      </div>
+    </section>
+
+    <h3 class="section-title">为您推荐</h3>
+    <div class="grid-container">
+      <div class="product-grid">
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M7,2l11,11l-5,5l-2,2L2,11V2H7z M12,8c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S10.9,8,12,8z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">Ultra Phone 15</div>
+            <div class="card-bottom">
+              <div class="price">¥5999</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20,18c1.1,0,2-0.9,2-2V6c0-1.1-0.9-2-2-2H4C2.9,4,2,4.9,2,6v10c0,1.1,0.9,2,2,2H0v2h24v-2H20z M4,6h16v10H4V6z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">MacBook Air</div>
+            <div class="card-bottom">
+              <div class="price">¥8999</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M15,13l-4-4l1.41-1.41L14,9.17V5h2v4.17l1.59-1.59L19,9L15,13z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">Smart Watch</div>
+            <div class="card-bottom">
+              <div class="price">¥1299</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M9,16.17L4.83,12l-1.42,1.41L9,19L21,7l-1.41-1.41L9,16.17z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">AirPods Pro</div>
+            <div class="card-bottom">
+              <div class="price">¥1899</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M20,2H4C2.9,2,2,2.9,2,4v12c0,1.1,0.9,2,2,2h14l4,4V4C22,2.9,21.1,2,20,2z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">AI Speaker</div>
+            <div class="card-bottom">
+              <div class="price">¥299</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-img">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4,6H2v14c0,1.1,0.9,2,2,2h14v-2H4V6z M20,2H8C6.9,2,6,2.9,6,4v12c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z"
+              />
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="card-title">VR Headset</div>
+            <div class="card-bottom">
+              <div class="price">¥2499</div>
+              <div class="add-btn">
+                <svg viewBox="0 0 24 24">
+                  <path d="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6V13z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fab">
+      <div class="badge">3</div>
+      <svg viewBox="0 0 24 24">
+        <path
+          d="M7,18c-1.1,0-1.99,0.9-1.99,2S5.9,22,7,22s2-0.9,2-2S8.1,18,7,18z M17,18c-1.1,0-1.99,0.9-1.99,2s0.89,2,1.99,2s2-0.9,2-2 S18.1,18,17,18z M8.1,13h7.45c0.75,0,1.41-0.41,1.75-1.03l3.86-7.01L19.42,4l-3.86,7H8.53L4.27,2H1v2h2l3.6,7.59l-1.35,2.44 C4.52,15.37,5.48,17,7,17h12v-2H7l1.1-2z"
+        />
+      </svg>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Tech Store. All rights reserved.</p>
+    </footer>
+  </body>
+</html>

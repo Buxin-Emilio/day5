@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevLog 2025 | 技术文档</title>
+    <style>
+      /* * ==========================================
+         * 1. CSS 变量系统 (方便主题切换)
+         * ==========================================
+         */
+      :root {
+        /* 核心色板 */
+        --primary: #4361ee;
+        --primary-hover: #3a53d0;
+
+        /* 暗黑模式默认值 */
+        --bg-body: #0f0f1a;
+        --bg-card: #ffffff;
+        --text-main: #1e202b; /* 卡片内的文字深色 */
+        --text-body: #f8f9fa; /* 背景上的文字浅色 */
+        --text-sub: #6c757d;
+        --border: rgba(255, 255, 255, 0.1);
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        --glass: rgba(15, 15, 26, 0.8);
+
+        /* 尺寸 */
+        --radius: 16px;
+        --sidebar-width: 280px;
+      }
+
+      /* 浅色模式覆盖 (通过 .light-mode 类触发) */
+      body.light-mode {
+        --bg-body: #f0f2f5;
+        --bg-card: #ffffff;
+        --text-main: #212529;
+        --text-body: #212529;
+        --text-sub: #868e96;
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        --glass: rgba(255, 255, 255, 0.9);
+      }
+
+      /* * ==========================================
+         * 2. 全局基础样式 (Reset & Base)
+         * ==========================================
+         */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* 主题切换过渡 */
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-body);
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+
+      /* 背景装饰光晕 (营造科技感) */
+      .glow-bg {
+        position: fixed;
+        top: -10%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+        opacity: 0.15;
+        filter: blur(80px);
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      /* * ==========================================
+         * 3. 布局结构 (Layout)
+         * ==========================================
+         */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr; /* 左侧固定宽，右侧自适应 */
+        gap: 40px;
+        position: relative;
+      }
+
+      /* * ==========================================
+         * 4. 侧边栏 (Sidebar)
+         * ==========================================
+         */
+      .sidebar {
+        position: sticky; /* 关键：实现滚动固定 */
+        top: 40px;
+        height: fit-content;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+      }
+
+      /* 博客 Logo 区域 */
+      .brand {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand span {
+        color: var(--primary);
+      }
+
+      /* 搜索框 */
+      .search-box {
+        position: relative;
+        margin-bottom: 30px;
+      }
+      .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 40px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-body);
+        font-size: 0.9rem;
+        backdrop-filter: blur(4px);
+      }
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      }
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        fill: var(--text-sub);
+      }
+
+      /* 目录导航 */
+      .nav-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-sub);
+        margin-bottom: 16px;
+      }
+
+      .nav-list li {
+        margin-bottom: 8px;
+      }
+
+      .nav-link {
+        display: block;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: var(--text-sub);
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+      }
+
+      .nav-link:hover {
+        color: var(--text-body);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* 激活状态 (Scroll Spy) */
+      .nav-link.active {
+        color: var(--primary);
+        background: rgba(67, 97, 238, 0.1);
+        border-left-color: var(--primary);
+        font-weight: 600;
+      }
+
+      /* 主题切换按钮 */
+      .theme-toggle {
+        margin-top: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 8px;
+        color: var(--text-sub);
+        user-select: none;
+      }
+      .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* * ==========================================
+         * 5. 主内容区 (Main Content)
+         * ==========================================
+         */
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* 文章卡片 */
+      .article-card {
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        padding: 30px;
+        box-shadow: var(--shadow);
+        color: var(--text-main);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 浅色边框增加质感 */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      /* 顶部装饰条 (可选) */
+      .article-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .article-card:hover::before {
+        opacity: 1;
+      }
+
+      /* 卡片头部信息 */
+      .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.85rem;
+        color: var(--text-sub);
+        margin-bottom: 12px;
+      }
+
+      .tag {
+        background: rgba(67, 97, 238, 0.1);
+        color: var(--primary);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+      }
+
+      .read-time {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* 卡片标题与摘要 */
+      .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+        line-height: 1.3;
+      }
+      .card-title a:hover {
+        color: var(--primary);
+        transition: 0.2s;
+      }
+
+      .card-excerpt {
+        color: var(--text-sub);
+        margin-bottom: 20px;
+        font-size: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* 限制2行 */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis; /* 用于单行截断，但在这里也起到辅助作用 */
+        line-height: 1.5em; /* 设置行高 */
+        max-height: 3em; /* 确保最大高度为2行 */
+      }
+
+      /* 卡片底部 */
+      .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 20px;
+      }
+
+      .author {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--primary);
+      }
+
+      .read-more {
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* * ==========================================
+         * 6. 分页 (Pagination)
+         * ==========================================
+         */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 40px;
+      }
+
+      .page-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-body);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .page-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .page-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+
+      /* * ==========================================
+         * 7. 移动端适配 (Mobile Responsive)
+         * ==========================================
+         */
+      @media (max-width: 768px) {
+        .container {
+          grid-template-columns: 1fr; /* 单列布局 */
+          padding: 20px;
+          gap: 20px;
+        }
+
+        /* 移动端侧边栏变身为顶部导航 */
+        .sidebar {
+          position: relative;
+          top: 0;
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .brand {
+          justify-content: space-between;
+          margin-bottom: 20px;
+        }
+
+        /* 隐藏详细目录，只保留分类 (模拟) */
+        .nav-list {
+          display: flex;
+          overflow-x: auto;
+          gap: 10px;
+          padding-bottom: 10px;
+          white-space: nowrap;
+          /* 隐藏滚动条 */
+          scrollbar-width: none;
+        }
+        .nav-list::-webkit-scrollbar {
+          display: none;
+        }
+
+        .nav-link {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--border);
+          border-left: 1px solid var(--border); /* 重置左边框 */
+        }
+
+        .nav-link.active {
+          border-left: 1px solid var(--primary);
+        }
+
+        .card-title {
+          font-size: 1.25rem;
+        }
+        .article-card {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 背景装饰 -->
+    <div class="glow-bg"></div>
+
+    <div class="container">
+      <!-- 左侧：固定功能栏 -->
+      <aside class="sidebar">
+        <div class="brand">
+          DevLog<span>.io</span>
+          <!-- 移动端显示的简单菜单图标 -->
+          <svg
+            class="mobile-menu-icon"
+            style="width: 24px; display: none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="currentColor"
+              d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+            />
+          </svg>
+        </div>
+
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24">
+            <path
+              d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+            />
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="搜索文章 / 文档..."
+          />
+        </div>
+
+        <div class="nav-title">目录导航</div>
+        <ul class="nav-list" id="sidebar-nav">
+          <!-- 这里的 ID 对应文章卡片的 ID，用于滚动高亮 -->
+          <li><a href="#post-1" class="nav-link active">2025 前端趋势</a></li>
+          <li><a href="#post-2" class="nav-link">WebAssembly 实战</a></li>
+          <li><a href="#post-3" class="nav-link">CSS 玻璃拟态指南</a></li>
+          <li>
+            <a href="#post-4" class="nav-link">React Server Components</a>
+          </li>
+          <li><a href="#post-5" class="nav-link">极简设计哲学</a></li>
+        </ul>
+
+        <div class="theme-toggle" id="theme-btn">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <span>切换外观模式</span>
+        </div>
+      </aside>
+
+      <!-- 右侧：文章列表内容 -->
+      <main class="main-content">
+        <!-- 文章 1 -->
+        <article class="article-card" id="post-1">
+          <div class="card-meta">
+            <span class="tag">趋势分析</span>
+            <span class="read-time">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"
+                />
+              </svg>
+              5 min
+            </span>
+            <span>2025-11-24</span>
+          </div>
+          <h2 class="card-title">
+            <a href="#">2025年 前端开发技术栈全景解析</a>
+          </h2>
+          <p class="card-excerpt">
+            深入探讨 2025 年前端生态系统的变化。随着 AI
+            辅助编码的普及，开发者将更多精力集中在架构设计与性能优化上。本文将分析
+            Next.js 16、Rust 工具链以及边缘计算的最新进展...
+          </p>
+          <div class="card-footer">
+            <div class="author">
+              <div class="avatar"></div>
+              <span>Alex.Dev</span>
+            </div>
+            <a href="#" class="read-more">阅读全文 &rarr;</a>
+          </div>
+        </article>
+
+        <!-- 文章 2 -->
+        <article class="article-card" id="post-2">
+          <div class="card-meta">
+            <span class="tag">WebAssembly</span>
+            <span class="read-time">8 min</span>
+            <span>2025-11-20</span>
+          </div>
+          <h2 class="card-title">
+            <a href="#">从入门到精通：WebAssembly 在图像处理中的应用</a>
+          </h2>
+          <p class="card-excerpt">
+            浏览器端的性能瓶颈如何突破？WebAssembly
+            提供了接近原生的执行速度。本文通过一个实时的滤镜处理案例，展示如何将
+            C++ 模块编译并在 React 项目中调用，实现 10 倍性能提升。
+          </p>
+          <div class="card-footer">
+            <div class="author">
+              <div class="avatar"></div>
+              <span>Alex.Dev</span>
+            </div>
+            <a href="#" class="read-more">阅读全文 &rarr;</a>
+          </div>
+        </article>
+
+        <!-- 文章 3 -->
+        <article class="article-card" id="post-3">
+          <div class="card-meta">
+            <span class="tag">UI/UX</span>
+            <span class="read-time">4 min</span>
+            <span>2025-11-15</span>
+          </div>
+          <h2 class="card-title">
+            <a href="#">现代 CSS：如何优雅地实现玻璃拟态 (Glassmorphism)</a>
+          </h2>
+          <p class="card-excerpt">
+            backdrop-filter 属性已经得到了全面支持。本文是一份复制即用的 CSS
+            指南，教你如何通过多层阴影、模糊和噪点纹理，打造出具有深度感的 2025
+            科技风界面。
+          </p>
+          <div class="card-footer">
+            <div class="author">
+              <div class="avatar"></div>
+              <span>Sarah Design</span>
+            </div>
+            <a href="#" class="read-more">阅读全文 &rarr;</a>
+          </div>
+        </article>
+
+        <!-- 文章 4 (占位用于演示滚动) -->
+        <article class="article-card" id="post-4">
+          <div class="card-meta">
+            <span class="tag">React</span><span class="read-time">6 min</span>
+          </div>
+          <h2 class="card-title">
+            <a href="#">React Server Components 最佳实践</a>
+          </h2>
+          <p class="card-excerpt">
+            服务端组件改变了数据获取的方式。如何平衡服务器负载与客户端交互？这里有
+            5 个你必须知道的模式。
+          </p>
+          <div class="card-footer">
+            <div class="author">
+              <div class="avatar"></div>
+              <span>Alex.Dev</span>
+            </div>
+            <a href="#" class="read-more">阅读全文 &rarr;</a>
+          </div>
+        </article>
+
+        <!-- 文章 5 (占位用于演示滚动) -->
+        <article class="article-card" id="post-5">
+          <div class="card-meta">
+            <span class="tag">观点</span><span class="read-time">3 min</span>
+          </div>
+          <h2 class="card-title">
+            <a href="#">极简主义：少即是多的代码哲学</a>
+          </h2>
+          <p class="card-excerpt">
+            不仅仅是设计风格，更是一种编码态度。减少依赖，回归原生
+            HTML/CSS，构建更健壮的互联网。
+          </p>
+          <div class="card-footer">
+            <div class="author">
+              <div class="avatar"></div>
+              <span>Alex.Dev</span>
+            </div>
+            <a href="#" class="read-more">阅读全文 &rarr;</a>
+          </div>
+        </article>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <button class="page-btn">&lt;</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">...</button>
+          <button class="page-btn">&gt;</button>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // ==========================================
+      // 1. 暗黑/浅色模式切换逻辑
+      // ==========================================
+      const themeBtn = document.getElementById("theme-btn");
+      const body = document.body;
+
+      themeBtn.addEventListener("click", () => {
+        body.classList.toggle("light-mode");
+        // 更新按钮文字
+        const isLight = body.classList.contains("light-mode");
+        const span = themeBtn.querySelector("span");
+        span.textContent = isLight ? "切换暗黑模式" : "切换浅色模式";
+      });
+
+      // ==========================================
+      // 2. 侧边栏滚动高亮 (Scroll Spy)
+      // ==========================================
+      const navLinks = document.querySelectorAll(".nav-link");
+      const articles = document.querySelectorAll(".article-card");
+
+      const observerOptions = {
+        root: null,
+        rootMargin: "-20% 0px -60% 0px", // 视口中间区域触发
+        threshold: 0,
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // 移除所有激活状态
+            navLinks.forEach((link) => link.classList.remove("active"));
+
+            // 找到对应的链接并激活
+            const id = entry.target.getAttribute("id");
+            const activeLink = document.querySelector(
+              `.nav-link[href="#${id}"]`
+            );
+            if (activeLink) {
+              activeLink.classList.add("active");
+            }
+          }
+        });
+      }, observerOptions);
+
+      articles.forEach((article) => {
+        observer.observe(article);
+      });
+
+      // 点击导航平滑滚动
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const targetId = this.getAttribute("href");
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+            // 考虑 sticky header 的偏移量（如果有的话，这里预留20px）
+            const offsetTop = targetElement.offsetTop - 20;
+            window.scrollTo({
+              top: offsetTop,
+              behavior: "smooth",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechMall 2025 - 极简科技商城</title>
+    <style>
+      /* =========================================
+           1. 全局重置与变量定义
+           ========================================= */
+      :root {
+        --primary-color: #4361ee; /* 科技蓝主色 */
+        --primary-hover: #3a50c7; /* 悬停深色 */
+        --bg-color: #f8f9ff; /* 页面背景 */
+        --card-bg: #f0d8d8; /* 卡片背景 */
+        --text-main: #1f2937; /* 主要文字 */
+        --text-sub: #6b7280; /* 次要文字 */
+        --shadow-sm: 0 4px 6px -1px rgba(67, 97, 238, 0.1);
+        /* 这个是阴影的轻微效果，作用于卡片和按钮 */
+        --shadow-hover: 0 10px 25px -5px rgba(67, 97, 238, 0.25);
+        /* 这个是阴影的较深效果，作用于卡片和按钮的悬停状态 */
+        --radius-std: 12px; /* 标准圆角 */
+        --nav-height: 64px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        padding-top: var(--nav-height); /* 防止内容被固定导航栏遮挡 */
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+
+      /* =========================================
+           2. 固定顶部导航栏 (Glassmorphism)
+           ========================================= */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background: rgba(255, 255, 255, 0.9); /* 半透明背景 */
+        backdrop-filter: blur(10px); /* 毛玻璃效果 */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 5%;
+        transition: all 0.3s ease;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--primary-color);
+        letter-spacing: -0.5px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+      }
+
+      .nav-item {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-main);
+        transition: color 0.3s;
+        cursor: pointer;
+      }
+
+      .nav-item:hover {
+        color: var(--primary-color);
+      }
+
+      .icon-btn {
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+      }
+
+      .btn-login {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        transition: background 0.3s;
+      }
+
+      .btn-login:hover {
+        background-color: var(--primary-hover);
+      }
+
+      /* =========================================
+           3. 巨幕轮播区 (Hero Section)
+           ========================================= */
+      .hero-section {
+        width: 100%;
+        height: 450px;
+        background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+      }
+
+      /* 模拟背景纹理 */
+      .hero-section::after {
+        content: "";
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 10%,
+          transparent 10%
+        );
+        background-size: 30px 30px;
+        opacity: 0.3;
+        transform: rotate(45deg);
+      }
+
+      .hero-content {
+        z-index: 2;
+        padding: 20px;
+      }
+
+      .hero-title {
+        font-size: 48px;
+        margin-bottom: 15px;
+        font-weight: 700;
+      }
+
+      .hero-subtitle {
+        font-size: 18px;
+        opacity: 0.9;
+        margin-bottom: 30px;
+      }
+
+      .hero-btn {
+        padding: 12px 30px;
+        background: white;
+        color: var(--primary-color);
+        font-weight: 600;
+        border-radius: 30px;
+        display: inline-block;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 简单的轮播指示点模拟 */
+      .dots {
+        position: absolute;
+        bottom: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 2;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+      }
+      .dot.active {
+        background: white;
+        width: 25px;
+        border-radius: 5px;
+      }
+
+      /* =========================================
+           4. 分类快捷入口
+           ========================================= */
+      .category-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+
+      .category-grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .cat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        flex: 1;
+        min-width: 80px; /* 保证在小屏幕不挤压 */
+      }
+
+      .cat-icon {
+        width: 60px;
+        height: 60px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 10px;
+        color: var(--primary-color);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .cat-item:hover .cat-icon {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .cat-name {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      /* =========================================
+           5. 商品网格 (Grid Layout)
+           ========================================= */
+      .products-section {
+        max-width: 1200px;
+        margin: 0 auto 60px auto;
+        padding: 0 20px;
+      }
+
+      .section-title {
+        font-size: 22px;
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 15px;
+      }
+
+      .section-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 20px;
+        background: var(--primary-color);
+        border-radius: 2px;
+      }
+
+      .product-grid {
+        display: grid;
+        /* 默认PC端：5列 (这里设为 auto-fill 配合 minmax 更加灵活，或者强制 repeat) */
+        /* 需求要求：电脑4-5列，平板3列，手机2列 */
+        /* 使用 minmax(200px, 1fr) 实现自适应 */
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+      }
+
+      .product-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-std);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        border: 1px solid rgba(0, 0, 0, 0.02);
+      }
+
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+      }
+
+      /* 模拟图片区域 */
+      .p-img {
+        width: 100%;
+        aspect-ratio: 1 / 1; /* 正方形 */
+        background: linear-gradient(120deg, #e0e7ff 0%, #f0f4ff 100%);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a5b4fc;
+        font-size: 40px;
+      }
+
+      /* 标签 */
+      .p-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #ef4444;
+        color: white;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .p-info {
+        padding: 15px;
+      }
+
+      .p-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .p-desc {
+        font-size: 12px;
+        color: var(--text-sub);
+        margin-bottom: 12px;
+      }
+
+      .p-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .p-price {
+        color: var(--primary-color);
+        font-weight: 800;
+        font-size: 18px;
+      }
+      .p-price span {
+        font-size: 12px;
+        font-weight: normal;
+      }
+
+      .btn-add {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #eff3ff;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .btn-add:hover {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      /* =========================================
+           6. 底部
+           ========================================= */
+      footer {
+        background: white;
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--text-sub);
+        font-size: 14px;
+        border-top: 1px solid #eee;
+      }
+
+      /* =========================================
+           7. 响应式适配 (Media Queries)
+           ========================================= */
+
+      /* 平板及小屏幕笔记本 (<= 1024px) -> 3列 */
+      @media (max-width: 1024px) {
+        .product-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .hero-section {
+          height: 350px;
+        }
+        .hero-title {
+          font-size: 36px;
+        }
+      }
+
+      /* 手机端 (<= 768px) -> 2列 */
+      @media (max-width: 768px) {
+        /* 导航栏调整 */
+        .nav-links span {
+          display: none;
+        } /* 隐藏文字只留图标 */
+        .nav-item {
+          font-size: 20px;
+        } /* 放大图标 */
+        .nav-links {
+          gap: 15px;
+        }
+        .btn-login {
+          padding: 6px 12px;
+          font-size: 12px;
+        }
+        .logo {
+          font-size: 20px;
+        }
+
+        /* 轮播图调整 */
+        .hero-section {
+          height: 260px;
+        }
+        .hero-title {
+          font-size: 28px;
+        }
+        .hero-subtitle {
+          font-size: 14px;
+        }
+
+        /* 网格调整 */
+        .product-grid {
+          grid-template-columns: repeat(2, 1fr); /* 强制2列 */
+          gap: 10px; /* 间距缩小 */
+        }
+
+        .category-grid {
+          gap: 10px;
+        }
+        .cat-item {
+          min-width: 30%;
+          margin-bottom: 10px;
+        }
+        .cat-icon {
+          width: 45px;
+          height: 45px;
+          font-size: 20px;
+        }
+
+        /* 商品卡片内边距缩小 */
+        .p-info {
+          padding: 10px;
+        }
+        .p-price {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo">瓦影之鱼</div>
+      <nav class="nav-links">
+        <a href="#" class="nav-item">首页</a>
+        <a href="#" class="nav-item">分类</a>
+        <a href="#" class="nav-item icon-btn">购物车</a>
+        <a href="#" class="btn-login">登录</a>
+      </nav>
+    </header>
+
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">未来科技，触手可及</h1>
+        <p class="hero-subtitle">2025 春季新品发布会，全场 3 期免息</p>
+        <a href="#" class="hero-btn">立即探索</a>
+      </div>
+      <div class="dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </section>
+
+    <section class="category-section">
+      <div class="category-grid">
+        <div class="cat-item">
+          <div class="cat-icon">📱</div>
+          <span class="cat-name">手机</span>
+        </div>
+        <div class="cat-item">
+          <div class="cat-icon">💻</div>
+          <span class="cat-name">电脑</span>
+        </div>
+        <div class="cat-item">
+          <div class="cat-icon">⌚</div>
+          <span class="cat-name">穿戴</span>
+        </div>
+        <div class="cat-item">
+          <div class="cat-icon">🎧</div>
+          <span class="cat-name">音频</span>
+        </div>
+        <div class="cat-item">
+          <div class="cat-icon">🎮</div>
+          <span class="cat-name">游戏</span>
+        </div>
+        <div class="cat-item">
+          <div class="cat-icon">🏠</div>
+          <span class="cat-name">家居</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <h2 class="section-title">热门推荐</h2>
+      <div class="product-grid">
+        <div class="product-card">
+          <div class="p-img">📷<span class="p-tag">热销</span></div>
+          <div class="p-info">
+            <div class="p-title">UltraLens X5 相机</div>
+            <div class="p-desc">8K 录制 / AI 对焦</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 4999</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">🎧</div>
+          <div class="p-info">
+            <div class="p-title">Sonic Pro 耳机</div>
+            <div class="p-desc">空间音频 / 100h续航</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 1299</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">⌚</div>
+          <div class="p-info">
+            <div class="p-title">Watch Series Z</div>
+            <div class="p-desc">全息投影 / 健康监测</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 2499</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">⌨️</div>
+          <div class="p-info">
+            <div class="p-title">MechKey 2077</div>
+            <div class="p-desc">磁轴 / RGB 光效</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 899</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">🖥️<span class="p-tag">新品</span></div>
+          <div class="p-info">
+            <div class="p-title">Vision Display 4K</div>
+            <div class="p-desc">144Hz / Type-C</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 1999</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">🖱️</div>
+          <div class="p-info">
+            <div class="p-title">AirMouse Elite</div>
+            <div class="p-desc">零重力 / 超轻量化</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 299</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">🤖</div>
+          <div class="p-info">
+            <div class="p-title">HomeBot Mini</div>
+            <div class="p-desc">家庭助手 / 语音管家</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 699</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="p-img">🕶️</div>
+          <div class="p-info">
+            <div class="p-title">VR Glass One</div>
+            <div class="p-desc">沉浸式体验 / 轻薄</div>
+            <div class="p-bottom">
+              <div class="p-price"><span>¥</span> 3499</div>
+              <button class="btn-add">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 TechMall Corporation. All Rights Reserved.</p>
+      <p style="margin-top: 5px; font-size: 12px; opacity: 0.6">
+        Designed for Future
+      </p>
+    </footer>
+  </body>
+</html>

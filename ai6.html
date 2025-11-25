@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alex.Dev | 2025 极简科技作品集</title>
+
+    <style>
+      /* ====================================================================
+           1. CSS 变量定义及全局重置 (Global Variables & Reset)
+           ==================================================================== */
+      :root {
+        --primary: #4361ee; /* 主色：科技蓝 */
+        --bg-dark: #0f0f1a; /* 全局暗黑背景 */
+        --bg-card: #ffffff; /* 卡片背景：纯白 */
+        --text-light: #f8f9fa; /* 背景上的文字颜色 */
+        --text-dark: #212529; /* 卡片上的主要文字颜色 */
+        --text-sub: #adb5bd; /* 次要文字颜色 */
+        --radius: 16px; /* 统一圆角 */
+        --max-width: 1000px; /* 页面最大宽度 */
+      }
+
+      * {
+        margin: 0; /* 去除默认外边距 */
+        padding: 0; /* 去除默认内边距 */
+        box-sizing: border-box; /* 盒模型设置为包含边框和内边距 */
+        transition: background-color 0.3s, color 0.3s, transform 0.3s; /* 基础过渡动画 */
+      }
+
+      body {
+        font-family: "Inter", -apple-system, sans-serif; /* 字体设置 */
+        background-color: var(--bg-dark); /* 设置暗黑背景 */
+        color: var(--text-light); /* 设置默认文字颜色 */
+        line-height: 1.6; /* 行高 */
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--primary);
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.2;
+      }
+
+      /* 内容中心对齐容器 */
+      .container {
+        max-width: var(--max-width); /* 限制容器最大宽度 */
+        margin: 0 auto; /* 居中 */
+        padding: 40px 20px; /* 顶部底部和左右内边距 */
+      }
+
+      /* 统一卡片样式 (包含轻微玻璃拟态阴影) */
+      .card {
+        background: var(--bg-card); /* 白色卡片背景 */
+        border-radius: var(--radius); /* 圆角 16px */
+        padding: 30px; /* 内边距 */
+        color: var(--text-dark); /* 卡片内文字为深色 */
+        /* 浅色玻璃拟态阴影 */
+        box-shadow: 0 8px 30px rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 轻微边框 */
+      }
+
+      /* 统一按钮样式 */
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+        border: none;
+      }
+      .btn-primary:hover {
+        background: var(--primary-hover, #3a53d0);
+        transform: translateY(-2px); /* 悬浮微动 */
+      }
+
+      /* ====================================================================
+           2. 英雄区 (Hero) - 个人简介
+           ==================================================================== */
+      #hero {
+        text-align: center; /* 文字居中 */
+        padding: 60px 20px;
+      }
+      .profile-title {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+      .profile-subtitle {
+        font-size: 1.5rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+      }
+      .tagline {
+        color: var(--text-sub);
+        max-width: 600px;
+        margin: 0 auto 40px;
+      }
+
+      /* 社交图标占位 */
+      .social-links a {
+        color: var(--text-light);
+        margin: 0 10px;
+        font-size: 1.2rem;
+        opacity: 0.8;
+      }
+      .social-links a:hover {
+        opacity: 1;
+        color: var(--primary);
+      }
+
+      /* ====================================================================
+           3. 技能进度条 (Skills)
+           ==================================================================== */
+      #skills {
+        padding-top: 50px;
+      }
+      .section-title {
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 40px;
+        color: var(--text-light);
+      }
+
+      .skill-list {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(300px, 1fr)
+        ); /* 响应式 2/3 列 */
+        gap: 20px;
+      }
+
+      .skill-item {
+        color: var(--text-light);
+      }
+      .skill-name {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 1rem;
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1); /* 进度条底色 (浅透明) */
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--primary); /* 进度条填充色 */
+        border-radius: 4px;
+        width: 0; /* 初始宽度为0 */
+        transition: width 1s ease-out; /* 动画过渡 */
+      }
+
+      /* JS 驱动的 Progress Bars 宽度设置 */
+      .progress-fill[data-level="95"] {
+        width: 95%;
+      }
+      .progress-fill[data-level="85"] {
+        width: 85%;
+      }
+      .progress-fill[data-level="75"] {
+        width: 75%;
+      }
+      .progress-fill[data-level="60"] {
+        width: 60%;
+      }
+
+      /* ====================================================================
+           4. 项目卡片 (Projects) - 3D 翻转效果
+           ==================================================================== */
+      #projects {
+        margin-top: 60px;
+      }
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+
+      .project-item {
+        /* 关键：启用 3D 转换 */
+        perspective: 1000px; /* 定义 3D 空间 */
+        cursor: pointer;
+      }
+
+      .project-inner {
+        position: relative;
+        width: 100%;
+        height: 250px; /* 固定高度 */
+        text-align: center;
+        transition: transform 0.8s; /* 翻转过渡时间 */
+        transform-style: preserve-3d; /* 关键：保留子元素在 3D 空间的位置 */
+      }
+
+      /* 悬停时翻转 180 度 */
+      .project-item:hover .project-inner {
+        transform: rotateY(180deg);
+      }
+
+      .project-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden; /* 关键：隐藏背面 */
+        backface-visibility: hidden; /* 隐藏背面，防止背面内容透过正面 */
+        border-radius: var(--radius);
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: var(--shadow);
+      }
+
+      .project-front {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .project-back {
+        background: var(--primary); /* 背面背景色为主色 */
+        color: white; /* 背面文字为白色 */
+        transform: rotateY(180deg); /* 翻转 180 度使其成为背面 */
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .project-title {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+      }
+      .project-tags {
+        font-size: 0.9rem;
+        color: var(--text-sub);
+      }
+
+      .project-back .project-title {
+        color: white;
+        margin-bottom: 15px;
+      } /* 背面标题颜色 */
+      .project-description {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      /* ====================================================================
+           5. 垂直时间轴 (Timeline) - 响应式设计
+           ==================================================================== */
+      #timeline {
+        margin-top: 60px;
+      }
+      .timeline-wrapper {
+        position: relative;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 10px;
+      }
+
+      /* 时间轴中央的垂直线 */
+      .timeline-wrapper::after {
+        content: "";
+        position: absolute;
+        width: 4px;
+        background-color: rgba(67, 97, 238, 0.3); /* 科技感半透明蓝线 */
+        top: 0;
+        bottom: 0;
+        left: 50%; /* 桌面端居中 */
+        margin-left: -2px;
+      }
+
+      .timeline-item {
+        padding: 10px 0;
+        position: relative;
+        background-color: inherit;
+        width: 50%; /* 桌面端项目占据一半宽度 */
+      }
+
+      /* 时间轴点 (圆圈) */
+      .timeline-item::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        right: -10px; /* 初始定位在右侧线外 */
+        background-color: var(--primary);
+        border: 3px solid var(--bg-dark); /* 突出圆点 */
+        top: 25px;
+        z-index: 1;
+      }
+
+      /* 左侧项目 */
+      .left {
+        left: 0;
+        padding-right: 30px;
+      }
+      .left::after {
+        left: unset; /* 移除 left 居中 */
+        right: -10px; /* 定位到右侧线上 */
+      }
+
+      /* 右侧项目 */
+      .right {
+        left: 50%; /* 移动到右半边 */
+        padding-left: 30px;
+        padding-right: 10px;
+      }
+      .right::after {
+        left: -10px; /* 定位到左侧线上 */
+        right: unset; /* 移除 right 定位 */
+      }
+
+      /* 时间轴内容卡片 */
+      .timeline-content {
+        background: var(--bg-card);
+        color: var(--text-dark);
+        border-radius: var(--radius);
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .timeline-content h3 {
+        color: var(--primary);
+        margin-bottom: 5px;
+      }
+      .timeline-content .date {
+        font-size: 0.9rem;
+        color: var(--text-sub);
+        margin-bottom: 10px;
+      }
+
+      /* ====================================================================
+           6. 联系表单 (Contact)
+           ==================================================================== */
+      #contact {
+        margin-top: 60px;
+      }
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* 桌面端：左表单，右信息 */
+        gap: 40px;
+      }
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* 表单样式 */
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-control {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--text-sub);
+        background: var(--bg-card);
+        color: var(--text-dark);
+        font-size: 1rem;
+      }
+      textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+      }
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      }
+
+      /* 邮箱复制区域 */
+      .email-copy-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .email-display {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--primary);
+      }
+      .copy-btn {
+        position: relative;
+        background: none;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+      }
+      /* 复制成功提示动画 */
+      .copy-message {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%) scale(0); /* 初始状态：缩小且不可见 */
+        background: #28a745; /* 绿色背景 */
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弹性过渡 */
+      }
+      /* JS 激活类 */
+      .copy-message.show {
+        transform: translateX(-50%) scale(1); /* 放大到可见 */
+        opacity: 1;
+      }
+
+      /* ====================================================================
+           7. 移动端适配 (Mobile Responsive)
+           ==================================================================== */
+      @media (max-width: 768px) {
+        .profile-title {
+          font-size: 2.5rem;
+        }
+        .profile-subtitle {
+          font-size: 1.2rem;
+        }
+        .section-title {
+          font-size: 1.6rem;
+        }
+
+        /* 项目卡片：单列 */
+        .project-grid {
+          grid-template-columns: 1fr;
+        }
+
+        /* 时间轴：改为单侧布局 */
+        .timeline-wrapper::after {
+          left: 20px; /* 垂直线移到左侧 */
+        }
+        .timeline-item {
+          width: 100%; /* 项目占满宽度 */
+          padding-left: 50px; /* 为时间轴线留出空间 */
+          padding-right: 10px;
+        }
+        .left,
+        .right {
+          left: 0; /* 无论左右都靠左排列 */
+          padding-right: 10px;
+        }
+        .timeline-item::after {
+          left: 14px !important; /* 圆点都定位在左侧线上 */
+          right: unset !important;
+        }
+
+        /* 联系表单：单列堆叠 */
+        .contact-grid {
+          grid-template-columns: 1fr;
+        }
+        .contact-info {
+          padding-top: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header id="hero">
+        <h1 class="profile-title">ALEX.DEV</h1>
+        <h2 class="profile-subtitle">
+          Full-Stack Architect & Digital Craftsman
+        </h2>
+        <p class="tagline">
+          专注于极简、高性能的 Web
+          应用程序架构。信仰原生代码，拒绝过度依赖框架。
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/yourprofile" target="_blank">GitHub</a> |
+          <a href="#contact">Contact</a>
+        </div>
+      </header>
+
+      <section id="skills">
+        <h2 class="section-title">技术栈</h2>
+        <div class="skill-list">
+          <div class="skill-item">
+            <div class="skill-name">
+              <span>HTML & CSS (Native)</span><span>95%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" data-level="95"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">
+              <span>JavaScript (ES2025+)</span><span>85%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" data-level="85"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">
+              <span>React / Vue</span><span>75%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" data-level="75"></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-name">
+              <span>Node.js / Go (Backend)</span><span>60%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" data-level="60"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projects">
+        <h2 class="section-title">精选项目</h2>
+        <div class="project-grid">
+          <div class="project-item">
+            <div class="project-inner">
+              <div class="project-face project-front card">
+                <h3 class="project-title">项目 1: Dev Dashboard</h3>
+                <p class="project-tags">#HTML #CSS Grid #Dark Mode</p>
+              </div>
+              <div class="project-face project-back">
+                <h3 class="project-title">项目描述</h3>
+                <p class="project-description">
+                  为开发者设计的高性能管理后台，专注于无 JS
+                  依赖的极简布局和响应式设计，完美演示了原生 CSS 的强大能力。
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  style="color: white; margin-top: 15px"
+                  >查看详情 &rarr;</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <div class="project-inner">
+              <div class="project-face project-front card">
+                <h3 class="project-title">项目 2: Quantum Portfolio</h3>
+                <p class="project-tags">#CSS Animation #3D Flip #Minimalism</p>
+              </div>
+              <div class="project-face project-back">
+                <h3 class="project-title">项目描述</h3>
+                <p class="project-description">
+                  一个极简的个人作品集，探索了 CSS 3D
+                  转换与玻璃拟态效果的完美结合，提升用户交互体验。
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  style="color: white; margin-top: 15px"
+                  >查看详情 &rarr;</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="project-item">
+            <div class="project-inner">
+              <div class="project-face project-front card">
+                <h3 class="project-title">项目 3: E-commerce Product Page</h3>
+                <p class="project-tags">#Mobile First #Scroll Snap #UX</p>
+              </div>
+              <div class="project-face project-back">
+                <h3 class="project-title">项目描述</h3>
+                <p class="project-description">
+                  为移动设备优化的电商产品详情页，利用 CSS Scroll Snap
+                  实现了原生的图片轮播滑动效果。
+                </p>
+                <a
+                  href="#"
+                  target="_blank"
+                  style="color: white; margin-top: 15px"
+                  >查看详情 &rarr;</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="timeline">
+        <h2 class="section-title">经验与教育</h2>
+        <div class="timeline-wrapper">
+          <div class="timeline-item left">
+            <div class="timeline-content card">
+              <h3>高级前端工程师</h3>
+              <p class="date">2023 - 至今</p>
+              <p>TechCorp, Inc. | 负责核心产品的前端架构设计与性能优化。</p>
+            </div>
+          </div>
+
+          <div class="timeline-item right">
+            <div class="timeline-content card">
+              <h3>前端开发工程师</h3>
+              <p class="date">2020 - 2023</p>
+              <p>Startup X | 参与多个 MVP 产品的从 0 到 1 开发。</p>
+            </div>
+          </div>
+
+          <div class="timeline-item left">
+            <div class="timeline-content card">
+              <h3>计算机科学硕士</h3>
+              <p class="date">2017 - 2020</p>
+              <p>XX 顶尖大学 | 研究方向：高性能 Web 计算与并行处理。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact">
+        <h2 class="section-title">联系我</h2>
+        <div class="contact-grid">
+          <div class="card">
+            <form action="#" method="POST">
+              <div class="form-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="您的姓名"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="您的邮箱"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <textarea
+                  class="form-control"
+                  placeholder="您的消息..."
+                  required
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">发送消息</button>
+            </form>
+          </div>
+
+          <div class="contact-info">
+            <div class="card email-copy-wrapper">
+              <p style="color: var(--text-dark); margin-bottom: 10px">
+                或通过邮箱联系：
+              </p>
+              <span class="email-display" id="myEmail"
+                >alex.dev@techmail.io</span
+              >
+
+              <button class="btn copy-btn" id="copyBtn">
+                一键复制邮箱
+                <span class="copy-message" id="copyMessage">已复制!</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // ====================================================================
+      // JS 1: 技能进度条激活动画
+      // ====================================================================
+      // 获取所有进度条填充元素
+      const progressFills = document.querySelectorAll(".progress-fill");
+      // 使用 IntersectionObserver 监听元素进入视口 (性能优化)
+      const skillObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            // 如果元素进入视口
+            if (entry.isIntersecting) {
+              const fill = entry.target;
+              // 设置 style width 触发 CSS 动画
+              fill.style.width = fill.getAttribute("data-level") + "%";
+              // 停止观察，防止重复触发
+              observer.unobserve(fill);
+            }
+          });
+        },
+        { threshold: 0.5 }
+      ); // 当 50% 可见时触发
+
+      progressFills.forEach((fill) => {
+        skillObserver.observe(fill);
+      });
+
+      // ====================================================================
+      // JS 2: 一键复制邮箱功能与动画
+      // ====================================================================
+      const copyBtn = document.getElementById("copyBtn");
+      const myEmail = document.getElementById("myEmail").textContent;
+      const copyMessage = document.getElementById("copyMessage");
+
+      copyBtn.addEventListener("click", () => {
+        // 复制文本到剪贴板
+        navigator.clipboard
+          .writeText(myEmail)
+          .then(() => {
+            // 显示复制成功提示动画
+            copyMessage.classList.add("show");
+
+            // 3D 翻转按钮文字 (可选，但能增加反馈)
+            copyBtn.textContent = "复制成功!";
+
+            // 1.5 秒后隐藏提示并恢复按钮文字
+            setTimeout(() => {
+              copyMessage.classList.remove("show");
+              copyBtn.textContent = "一键复制邮箱";
+            }, 1500);
+          })
+          .catch((err) => {
+            // 复制失败处理 (例如浏览器不支持)
+            console.error("复制失败: ", err);
+            alert("复制失败，请手动复制邮箱地址。");
+          });
+      });
+    </script>
+  </body>
+</html>

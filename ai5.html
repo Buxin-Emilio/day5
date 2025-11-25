@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | 2025 管理后台</title>
+
+    <style>
+      /* ====================================================================
+           1. CSS 变量定义及全局重置 (Global Variables & Reset)
+           ==================================================================== */
+      :root {
+        --primary: #4361ee; /* 主色：科技蓝 */
+        --bg-dark: #0f0f1a; /* 全局暗黑背景 */
+        --bg-card: #ffffff; /* 卡片背景：纯白 */
+        --text-light: #f8f9fa; /* 背景上的文字颜色 */
+        --text-dark: #212529; /* 卡片上的文字颜色 */
+        --text-sub: #adb5bd; /* 次要文字/图标颜色 */
+        --radius: 16px; /* 统一圆角 */
+        --sidebar-width: 260px; /* 侧边栏宽度 */
+      }
+
+      * {
+        margin: 0; /* 去除默认外边距 */
+        padding: 0; /* 去除默认内边距 */
+        box-sizing: border-box; /* 盒模型设置为包含边框和内边距 */
+      }
+
+      body {
+        font-family: "Inter", -apple-system, sans-serif; /* 字体设置 */
+        background-color: var(--bg-dark); /* 设置暗黑背景 */
+        color: var(--text-light); /* 设置默认文字颜色 */
+        overflow-x: hidden; /* 防止横向滚动条出现 */
+      }
+
+      /* 通用卡片样式 - 包含轻微玻璃拟态阴影 */
+      .card {
+        background: var(--bg-card); /* 白色卡片背景 */
+        border-radius: var(--radius); /* 圆角 16px */
+        padding: 20px; /* 内边距 */
+        color: var(--text-dark); /* 卡片内文字为深色 */
+        /* 浅色玻璃拟态阴影 */
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08); /* 轻微边框增加层次感 */
+      }
+
+      /* ====================================================================
+           2. 整体布局 (Grid Layout)
+           ==================================================================== */
+      #dashboard {
+        display: grid; /* 采用 Grid 布局 */
+        /* 桌面端：左侧栏固定宽度 + 右侧内容自适应 */
+        grid-template-columns: var(--sidebar-width) 1fr;
+        grid-template-rows: 60px 1fr; /* 顶部导航高 60px，内容区自适应 */
+        grid-template-areas:
+          "sidebar top-nav"
+          "sidebar content";
+        min-height: 100vh;
+      }
+
+      /* ====================================================================
+           3. 侧边栏 (Sidebar) - 左侧固定菜单
+           ==================================================================== */
+      #sidebar {
+        grid-area: sidebar; /* 放置在 grid-area: sidebar */
+        background: var(--bg-dark); /* 与主体背景同色，用于移动端抽屉背景 */
+        border-right: 1px solid rgba(255, 255, 255, 0.05); /* 细分隔线 */
+        position: fixed; /* 侧边栏固定 */
+        height: 100%; /* 高度占满 */
+        width: var(--sidebar-width); /* 宽度固定 */
+        z-index: 100; /* 层级高 */
+        padding-top: 20px; /* 顶部内边距 */
+        transition: transform 0.3s ease; /* 抽屉滑出动画过渡 */
+      }
+
+      .logo {
+        padding: 0 20px 30px; /* Logo 区域内边距 */
+        font-size: 1.5rem; /* 字体放大 */
+        font-weight: 800; /* 加粗 */
+        color: var(--text-light);
+      }
+      .logo span {
+        color: var(--primary);
+      } /* 主色高亮 */
+
+      /* 菜单项列表 */
+      .menu-list {
+        list-style: none; /* 去除列表默认点 */
+      }
+      .menu-list a {
+        display: flex; /* 弹性布局，图标和文字对齐 */
+        align-items: center; /* 垂直居中 */
+        padding: 12px 20px; /* 内边距 */
+        color: var(--text-sub); /* 次要颜色 */
+        transition: all 0.2s; /* 悬停过渡 */
+      }
+      .menu-list a:hover {
+        color: var(--text-light); /* 悬停文字变亮 */
+        background-color: rgba(67, 97, 238, 0.1); /* 悬停背景变浅蓝 */
+      }
+      .menu-list a.active {
+        color: var(--primary); /* 激活项文字变蓝 */
+        background-color: rgba(67, 97, 238, 0.15); /* 激活项背景 */
+        border-right: 4px solid var(--primary); /* 激活项右侧蓝色指示条 */
+      }
+      .menu-list svg {
+        width: 20px;
+        height: 20px; /* 图标大小 */
+        margin-right: 15px; /* 图标和文字间距 */
+        fill: currentColor; /* 继承父元素的颜色 */
+      }
+
+      /* ====================================================================
+           4. 顶部导航栏 (Top Navigation)
+           ==================================================================== */
+      #top-nav {
+        grid-area: top-nav; /* 放置在 grid-area: top-nav */
+        display: flex; /* 弹性布局 */
+        justify-content: space-between; /* 两端对齐 */
+        align-items: center; /* 垂直居中 */
+        padding: 0 20px; /* 左右内边距 */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* 底部细分隔线 */
+
+        /* 玻璃拟态效果 (半透明+模糊) */
+        background: rgba(15, 15, 26, 0.85);
+        backdrop-filter: blur(8px);
+        position: sticky; /* 顶部吸顶 */
+        top: 0;
+        z-index: 50;
+      }
+
+      .nav-left {
+        display: flex;
+        align-items: center;
+      }
+
+      /* 手机端菜单开关按钮 (默认隐藏) */
+      .menu-toggle {
+        display: none; /* 桌面端隐藏 */
+        background: none;
+        border: none; /* 去除边框和背景 */
+        cursor: pointer;
+        padding: 10px;
+      }
+      .menu-toggle svg {
+        width: 24px;
+        height: 24px;
+        fill: var(--text-light);
+      }
+
+      .profile {
+        display: flex;
+        gap: 10px; /* 头像和文字间距 */
+        align-items: center;
+      }
+      .avatar {
+        width: 30px;
+        height: 30px; /* 头像尺寸 */
+        border-radius: 50%; /* 圆形 */
+        background: var(--primary); /* 主色占位 */
+      }
+      .user-name {
+        font-size: 0.9rem;
+      }
+
+      /* ====================================================================
+           5. 主内容区 (Main Content)
+           ==================================================================== */
+      #content {
+        grid-area: content; /* 放置在 grid-area: content */
+        padding: 30px; /* 内边距 */
+        display: flex;
+        flex-direction: column; /* 垂直堆叠 */
+        gap: 30px; /* 区块间距 */
+      }
+
+      /* 仪表盘标题 */
+      .page-title {
+        font-size: 1.8rem; /* 字体大小 */
+        font-weight: 700;
+      }
+
+      /* 数据卡片网格布局 */
+      .data-cards {
+        display: grid; /* Grid 布局 */
+        /* 桌面端：4列等宽 */
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px; /* 卡片间距 */
+      }
+
+      .metric-value {
+        font-size: 2rem; /* 数据值大字体 */
+        font-weight: 800;
+        color: var(--primary); /* 主色突出 */
+        margin-bottom: 5px;
+      }
+      .metric-title {
+        font-size: 0.9rem; /* 标题小字体 */
+        color: var(--text-sub);
+      }
+      .metric-change {
+        font-size: 0.8rem;
+        margin-top: 10px;
+      }
+      .up {
+        color: #28a745;
+      } /* 上升指标颜色：绿色 */
+      .down {
+        color: #dc3545;
+      } /* 下降指标颜色：红色 */
+
+      /* 图表占位区 */
+      .chart-placeholder {
+        min-height: 300px; /* 最小高度 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--text-sub);
+      }
+
+      /* 最近订单表格 */
+      .recent-orders h2 {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+      }
+
+      .order-table {
+        width: 100%; /* 宽度占满卡片 */
+        border-collapse: collapse; /* 边框合并 */
+        text-align: left; /* 文字左对齐 */
+      }
+
+      .order-table th,
+      .order-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border); /* 底部细分隔线 */
+      }
+      .order-table th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-sub);
+      }
+      .order-table tr:last-child td {
+        border-bottom: none; /* 最后一行无底部边框 */
+      }
+
+      /* 状态标签 */
+      .status-tag {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .completed {
+        background: #d4edda;
+        color: #155724;
+      } /* 完成状态：绿 */
+      .pending {
+        background: #fff3cd;
+        color: #856404;
+      } /* 待处理状态：黄 */
+      .shipped {
+        background: #cce5ff;
+        color: #004085;
+      } /* 已发货状态：蓝 */
+
+      /* ====================================================================
+           6. 移动端适配 (Mobile Responsive)
+           ==================================================================== */
+      @media (max-width: 992px) {
+        /* 手机端布局：单列堆叠 */
+        #dashboard {
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "top-nav"
+            "content";
+        }
+
+        /* 侧边栏改为抽屉式 */
+        #sidebar {
+          transform: translateX(-100%); /* 默认隐藏在左侧屏幕外 */
+          position: fixed; /* 确保覆盖主内容 */
+          top: 0;
+          left: 0;
+          /* 玻璃拟态背景，用于抽屉效果 */
+          background: var(--bg-dark);
+          box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 抽屉打开时状态 (由 JS 控制 .sidebar-open 类) */
+        #sidebar.open {
+          transform: translateX(0); /* 滑入视图 */
+        }
+
+        /* 顶部导航：显示菜单开关 */
+        .menu-toggle {
+          display: block; /* 显示菜单按钮 */
+        }
+
+        /* 内容区调整 */
+        #content {
+          padding: 20px;
+          gap: 20px;
+        }
+
+        /* 数据卡片：手机端 2x2 布局 */
+        .data-cards {
+          grid-template-columns: 1fr 1fr; /* 2列 */
+          gap: 15px;
+        }
+
+        /* 表格适配：允许横向滚动 */
+        .recent-orders .card {
+          overflow-x: auto;
+        }
+        .order-table {
+          min-width: 600px; /* 设置最小宽度防止内容被压缩 */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="dashboard">
+      <aside id="sidebar">
+        <div class="logo">Admin<span>Panel</span></div>
+
+        <ul class="menu-list">
+          <li>
+            <a href="#" class="active">
+              <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+              </svg>
+              仪表盘
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                />
+              </svg>
+              用户管理
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-1.84-7l-1.63-2.73c-.22-.38-.64-.62-1.08-.62H7.28c-.44 0-.86.24-1.08.62L4.57 11h11.59zm-1.14 2H5l-.75-1.25L5.75 6h9.5L16.25 10l-.75 1z"
+                />
+              </svg>
+              订单列表
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1.01c-.52-.38-1.09-.72-1.71-.98L13 2.18c-.04-.21-.2-.35-.41-.35h-4c-.21 0-.38.14-.41.35L7.02 4.14c-.62.26-1.19.6-1.71.98l-2.49-1.01c-.22-.09-.49 0-.61.22l-2 3.46c-.12.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1.01c.52.38 1.09.72 1.71.98l.38 2.01c.03.21.19.35.41.35h4c.21 0 .38-.14.41-.35l.38-2.01c.62-.26 1.19-.6 1.71-.98l2.49 1.01c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"
+                />
+              </svg>
+              系统设置
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <header id="top-nav">
+        <button class="menu-toggle" id="menuToggle">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+          </svg>
+        </button>
+
+        <div class="page-title desktop-hide">Dashboard</div>
+
+        <div class="profile">
+          <div class="user-name">Alex.Dev</div>
+          <div class="avatar"></div>
+        </div>
+      </header>
+
+      <main id="content">
+        <h1 class="page-title mobile-hide">仪表盘概览</h1>
+
+        <section class="data-cards">
+          <div class="card metric-card">
+            <div class="metric-value">¥1.2M</div>
+            <div class="metric-title">总销售额</div>
+            <div class="metric-change up">+12.5% vs Last Month</div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-value">4,521</div>
+            <div class="metric-title">新增用户</div>
+            <div class="metric-change up">+4.8% vs Last Month</div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-value">1,980</div>
+            <div class="metric-title">完成订单</div>
+            <div class="metric-change down">-2.1% vs Last Month</div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-value">4.2%</div>
+            <div class="metric-title">转化率</div>
+            <div class="metric-change up">+0.5% vs Last Month</div>
+          </div>
+        </section>
+
+        <section class="charts card">
+          <h2 style="color: var(--text-dark); margin-bottom: 10px">
+            月度营收图
+          </h2>
+          <div class="chart-placeholder">
+            折线图占位区 (使用 SVG / Canvas 或其他库集成)
+          </div>
+        </section>
+
+        <section class="recent-orders">
+          <div class="card">
+            <h2>最近订单</h2>
+            <div class="table-responsive">
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>订单 ID</th>
+                    <th>客户</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                    <th>日期</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#90123</td>
+                    <td>李明</td>
+                    <td>¥1,299</td>
+                    <td><span class="status-tag completed">已完成</span></td>
+                    <td>2025-11-24</td>
+                  </tr>
+                  <tr>
+                    <td>#90124</td>
+                    <td>王芳</td>
+                    <td>¥450</td>
+                    <td><span class="status-tag shipped">已发货</span></td>
+                    <td>2025-11-23</td>
+                  </tr>
+                  <tr>
+                    <td>#90125</td>
+                    <td>张伟</td>
+                    <td>¥5,999</td>
+                    <td><span class="status-tag pending">待处理</span></td>
+                    <td>2025-11-23</td>
+                  </tr>
+                  <tr>
+                    <td>#90126</td>
+                    <td>刘丽</td>
+                    <td>¥299</td>
+                    <td><span class="status-tag completed">已完成</span></td>
+                    <td>2025-11-22</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // 获取元素
+      const menuToggle = document.getElementById("menuToggle"); // 菜单按钮
+      const sidebar = document.getElementById("sidebar"); // 侧边栏
+      const dashboard = document.getElementById("dashboard"); // 主容器 (用于关闭操作)
+
+      // 监听菜单按钮点击事件
+      menuToggle.addEventListener("click", () => {
+        // 切换侧边栏的 'open' 类，实现滑入/滑出动画
+        sidebar.classList.toggle("open");
+      });
+
+      // 监听侧边栏内部点击事件 (用于点击菜单项后自动关闭)
+      sidebar.addEventListener("click", (e) => {
+        // 检查点击的元素是否是菜单链接
+        if (e.target.closest("a")) {
+          // 如果是，且当前是手机视图 (通过 CSS media query 判断)
+          if (window.innerWidth <= 992) {
+            // 延迟关闭，让用户看到点击效果
+            setTimeout(() => {
+              sidebar.classList.remove("open");
+            }, 150);
+          }
+        }
+      });
+
+      // (可选) 监听窗口大小变化，在桌面端自动移除 'open' 类
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 992) {
+          sidebar.classList.remove("open");
+        }
+      });
+    </script>
+  </body>
+</html>
